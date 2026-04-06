@@ -384,7 +384,7 @@ const MODELS = [
       { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Cada especie (columna) se baraja de forma independiente entre sitios.' },
       { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo. La estructura funcional no cambia.' }
     ],
-    example: '<strong>Ejemplo:</strong> Se toman las 4 coberturas de <em>Heliconia marginata</em> y se reparten al azar entre los 4 sitios. Luego se hace lo mismo con cada especie por separado. Las especies no se coordinan entre sí.'
+    example: 'Plantas helófitas que se distribuyen según su tolerancia específica a la anoxia del suelo en humedales (Casanova &amp; Brock, 2000).'
   },
   {
     id: 2,
@@ -399,7 +399,7 @@ const MODELS = [
       { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Filas enteras (sitios) se intercambian. Las especies varían juntas o no varían.' },
       { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo.' }
     ],
-    example: '<strong>Ejemplo:</strong> Todo el ensamblaje del sitio S1 (todas sus especies y coberturas) se asigna al azar a otro sitio. La composición interna de cada comunidad se conserva intacta.'
+    example: 'Formación de islas flotantes en lagunas, donde un conjunto de especies colonizan juntas un espacio (Gordon Colón et al., 2017).'
   },
   {
     id: 3,
@@ -414,14 +414,14 @@ const MODELS = [
       { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Columnas (especies) se barajan dentro de cada sitio por separado.' },
       { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo.' }
     ],
-    example: '<strong>Ejemplo:</strong> En la parcela P3 coexisten varias especies. ¿Por qué domina <em>Hymenachne</em> con 60% y no otra? El modelo pregunta si eso es azar de colonización o filtro ambiental real.'
+    example: 'Colonización de insectos en sustratos nuevos donde las primeras especies facilitan o inhiben a las posteriores (Sladecek et al., 2021).'
   },
   {
     id: 4,
     name: 'Restricción por adaptaciones',
     ref: 'Control histórico–evolutivo',
     h0: '<strong>H₀:</strong> no existe relación entre los rasgos funcionales y la distribución espacial de las especies.',
-    permL: 'colswhole',  // columnas enteras de L (vectores de especie)
+    permL: 'colswhole',
     permQ: false,
     permR: false,
     chips: [
@@ -429,14 +429,14 @@ const MODELS = [
       { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Columnas enteras (vectores de especie entre sitios) se permutan. Rompe la relación especie–rasgo.' },
       { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo. Los rasgos permanecen asociados a su especie original.' }
     ],
-    example: '<strong>Ejemplo:</strong> Distribución de especies en un gradiente de deshielo. Aquellas con mayor área foliar y contenido de nitrógeno se concentraron en sitios de deshielo tardío, mientras que especies con mayor ángulo foliar y altura aparecieron en sitios de deshielo temprano (Dray et al., 2014).'
+    example: 'Distribución de especies en un gradiente de deshielo. Aquellas con mayor área foliar y contenido de nitrógeno se concentraron en sitios de deshielo tardío, mientras que especies con mayor ángulo foliar y altura aparecieron en sitios de deshielo temprano (Dray et al., 2014).'
   },
   {
     id: 5,
     name: 'Mezcla de regulación ambiental y adaptaciones',
     ref: 'Combinación restringida M2 + M4',
     h0: '<strong>H₀:</strong> no existe relación entre el ambiente y las especies, ni entre los rasgos y las especies.',
-    permL: 'both',  // filas + columnas de L
+    permL: 'both',
     permQ: false,
     permR: false,
     chips: [
@@ -444,7 +444,7 @@ const MODELS = [
       { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Filas Y columnas se permutan simultáneamente (combina M2 y M4).' },
       { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo.' }
     ],
-    example: '<strong>Ejemplo:</strong> Un herbazal donde <em>Sporobolus virginicus</em> domina tanto por su plasticidad fenotípica como por el pH del suelo. Algunas asociaciones responden al sitio, otras a los rasgos heredados.'
+    example: 'Un herbazal donde la dominancia de <em>Sporobolus virginicus</em> depende tanto de su plasticidad fenotípica como del pH y salinidad del suelo (Avendaño et al., 2018).'
   },
   {
     id: 6,
@@ -459,7 +459,7 @@ const MODELS = [
       { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Brazo A: permuta filas (como M2). Brazo B: permuta columnas enteras (como M4). Dos pruebas separadas.' },
       { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo en ambos brazos.' }
     ],
-    example: '<strong>Ejemplo:</strong> Aves urbanas cuya presencia depende estrictamente de si anidan en edificios y su hábito alimenticio. El modelo más estricto: controla el error tipo I en todos los escenarios posibles.'
+    example: 'Aves cuyas probabilidades de presencia en zonas urbanas dependen estrictamente de si anidan en edificios y de su hábito alimenticio (Brown et al., 2014). Test secuencial doble: significativo solo si ambos Brazo A y Brazo B arrojan p ≤ α (ter Braak et al., 2012).'
   }
 ];
 
@@ -908,5 +908,23 @@ function animateSequential(m) {
 buildSelector();
 renderModel(1);
 </script>
+
+<div style="max-width:880px;width:100%;margin-top:28px;padding:18px 24px;background:white;border:0.5px solid rgba(15,31,61,0.13);border-radius:14px;font-size:11.5px;color:#3d5070;line-height:1.9">
+  <div style="font-size:13px;font-weight:600;color:#0f1f3d;margin-bottom:10px;border-bottom:0.5px solid rgba(15,31,61,0.1);padding-bottom:8px">Referencias</div>
+  <p>Avendaño, Y., Fedón, I.C., Barreto-Pittol, E.M., Marrero, M. de los Á., Barreto, M.B. &amp; Suárez-Villasmil, L. (2018). Patrones espaciales en un herbazal halófilo: suelos, comunidades vegetales y plasticidad fenotípica de <em>Sporobolus virginicus</em> (L.) Kunth en el Estado Miranda, Venezuela. <em>Biota Colombiana</em>, 19, 23–40.</p>
+  <p>Brown, A.M., Warton, D.I., Andrew, N.R., Binns, M., Cassis, G. &amp; Gibb, H. (2014). The fourth-corner solution – using predictive models to understand how species traits interact with the environment. <em>Methods in Ecology and Evolution</em>, 5, 344–352.</p>
+  <p>Casanova, M.T. &amp; Brock, M.A. (2000). How do depth, duration and frequency of flooding influence the establishment of wetland plant communities? <em>Plant Ecology</em>, 147, 237–250.</p>
+  <p>Dray, S. &amp; Legendre, P. (2008). Testing the species traits-environment relationships: the fourth-corner problem revisited. <em>Ecology</em>, 89, 3400–3412.</p>
+  <p>Dray, S., Choler, P., Dolédec, S., Peres-Neto, P.R., Thuiller, W., Pavoine, S. &amp; ter Braak, C.J.F. (2014). Combining the fourth-corner and the RLQ methods for assessing trait responses to environmental variation. <em>Ecology</em>, 95, 14–21.</p>
+  <p>Gordon Colón, E., Suárez-Villasmil, L. &amp; Quevedo, A.M. (2017). Vegetación acuática en lagunas de rebalse del Río Orinoco (sector Orinoquia, Venezuela). <em>BioLlania</em>, Edición Especial 15, 334–356.</p>
+  <p>Legendre, P., Galzin, R. &amp; Harmelin-Vivien, M.L. (1997). Relating behavior to habitat: solutions to the fourth-corner problem. <em>Ecology</em>, 78, 547–562.</p>
+  <p>Sladecek, F.X.J., Segar, S.T. &amp; Konvicka, M. (2021). Early successional colonizers both facilitate and inhibit the late successional colonizers in communities of dung-inhabiting insects. <em>European Journal of Entomology</em>, 118, 240–249.</p>
+  <p>ter Braak, C.J.F., Cormont, A. &amp; Dray, S. (2012). Improved testing of species traits-environment relationships in the fourth-corner problem. <em>Ecology</em>, 93, 1525–1526.</p>
+</div>
+
+<div class="footer-credit" style="margin-top:16px">
+  Material elaborado por Lourdes M. Suárez Villasmil &amp; María de los Ángeles Marrero
+</div>
+
 </body>
 </html>
