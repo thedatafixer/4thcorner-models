@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modelos de Permutación · Cuarta Esquina</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --text: #0f1f3d;
+  --text2: #3d5070;
+  --text3: #8a96a8;
+  --border: rgba(15,31,61,0.07);
+  --border2: rgba(15,31,61,0.13);
+
+  --accent: #1a4b8c;
+  --accent-light: #e8eef8;
+  --accent-mid: #3b6fc4;
+
+  --L: #c2185b;   --L-bg: #fce4ec;  --L-border: #f48fb1;
+  --Q: #b06000;   --Q-bg: #fff3e0;  --Q-border: #ffcc80;
+  --R: #1a4b8c;   --R-bg: #e8eef8;  --R-border: #90aed4;
+  --D: #00695c;   --D-bg: #e0f2f1;  --D-border: #80cbc4;
+
+  --perm: #1a4b8c;
+  --perm-bg: #e8eef8;
+  --fixed: #c5cdd8;
+  --highlight: #1a4b8c;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 48px;
+}
+
+/* ── HEADER ── */
+.header { text-align: center; margin-bottom: 10px; }
+.header h1 {
+  font-size: 22px; font-weight: 600; letter-spacing: -0.4px;
+  color: var(--accent); margin-bottom: 6px;
+}
+.header p { font-size: 13.5px; color: var(--text2); line-height: 1.6; max-width: 600px; margin: 0 auto; }
+
+/* ── AUTHORS ── */
+.authors {
+  text-align: center; margin-bottom: 28px; margin-top: 10px;
+  max-width: 720px; padding: 10px 18px;
+  background: var(--surface); border: 0.5px solid var(--border2);
+  border-radius: 10px; border-left: 3px solid var(--accent);
+}
+.authors p { font-size: 12px; color: var(--text2); line-height: 1.7; }
+.authors strong { color: var(--accent); font-weight: 600; }
+.authors em { color: var(--text3); font-style: normal; font-size: 11px; }
+
+/* ── MODEL SELECTOR ── */
+.model-selector {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 24px;
+}
+.model-btn {
+  width: 52px; height: 52px; border-radius: 12px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px;
+}
+.model-btn span.num { font-size: 17px; font-weight: 700; line-height: 1; }
+.model-btn span.lbl { font-size: 8.5px; font-weight: 400; color: var(--text3); }
+.model-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+.model-btn.active {
+  background: var(--accent); color: white; border-color: var(--accent);
+  box-shadow: 0 4px 14px rgba(26,75,140,0.25);
+}
+.model-btn.active span.lbl { color: rgba(255,255,255,0.7); }
+
+/* ── MAIN CARD ── */
+.card {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 16px;
+  padding: 28px 32px;
+  width: 100%; max-width: 880px;
+  box-shadow: 0 2px 20px rgba(15,31,61,0.07);
+}
+
+.model-header {
+  display: flex; align-items: flex-start; gap: 16px;
+  margin-bottom: 24px; padding-bottom: 20px;
+  border-bottom: 0.5px solid var(--border);
+}
+.model-badge {
+  width: 46px; height: 46px; border-radius: 12px;
+  background: var(--accent); color: white;
+  font-size: 19px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.model-info h2 { font-size: 16px; font-weight: 600; margin-bottom: 3px; color: var(--accent); }
+.model-info .ref { font-size: 12px; color: var(--text3); margin-bottom: 7px; }
+.model-info .h0 {
+  font-size: 13px; color: var(--text2); line-height: 1.6;
+  background: var(--accent-light); border-radius: 8px; padding: 8px 12px;
+  border-left: 3px solid var(--accent);
+}
+.model-info .h0 strong { color: var(--accent); }
+
+/* ── MATRICES AREA ── */
+.matrices-area {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  gap: 0; align-items: center;
+  margin-bottom: 24px;
+}
+.matrix-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.matrix-label {
+  font-size: 11.5px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
+.matrix-container {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid var(--border2);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.matrix-container.mat-L { border-color: var(--L-border); }
+.matrix-container.mat-Q { border-color: var(--Q-border); }
+.matrix-container.mat-R { border-color: var(--R-border); }
+.matrix-container.perm-active { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(26,75,140,0.15); }
+.matrix-container.fixed-dim { opacity: 0.45; }
+
+.matrix-tag {
+  position: absolute; top: 5px; left: 5px;
+  font-size: 10.5px; font-weight: 700; color: white;
+  padding: 2px 7px; border-radius: 5px;
+  z-index: 2;
+}
+.mat-L .matrix-tag { background: var(--L); }
+.mat-Q .matrix-tag { background: var(--Q); }
+.mat-R .matrix-tag { background: var(--R); }
+
+.matrix-outer { display: flex; flex-direction: column; align-items: flex-start; }
+.col-labels-row {
+  display: flex; align-items: center;
+  padding-left: 26px; gap: 2px; margin-bottom: 2px;
+}
+.col-label {
+  width: 36px; text-align: center;
+  font-size: 9.5px; font-weight: 600; color: var(--text3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
+}
+.matrix-with-rowlabels { display: flex; flex-direction: row; align-items: flex-start; gap: 0; }
+.row-labels-col {
+  display: flex; flex-direction: column;
+  gap: 2px; padding-top: 28px; padding-right: 4px;
+}
+.row-label {
+  height: 32px; display: flex; align-items: center; justify-content: flex-end;
+  font-size: 9.5px; font-weight: 600; color: var(--text3);
+  white-space: nowrap; max-width: 24px; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
+}
+.matrix-grid {
+  display: grid; gap: 2px; padding: 26px 8px 8px; background: white;
+}
+.cell {
+  width: 36px; height: 32px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+  color: var(--text2); background: var(--bg);
+  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); position: relative;
+}
+.cell.row-perm { background: var(--accent-light); color: var(--accent); font-weight: 700; }
+.cell.col-perm { background: var(--accent-light); color: var(--accent); font-weight: 700; }
+.cell.indep-perm { background: var(--accent-light); color: var(--accent); font-weight: 700; }
+.cell.moving { animation: bounce 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes bounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18) translateY(-3px); }
+  100% { transform: scale(1); }
+}
+
+/* Arrow between matrices */
+.matrix-arrow {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 0 10px; font-size: 11px; color: var(--text3);
+}
+.arrow-line { display: flex; align-items: center; gap: 2px; font-size: 22px; color: var(--border2); }
+.arrow-label { font-size: 10.5px; color: var(--text3); text-align: center; line-height: 1.3; }
+
+/* ── PERMUTATION CHIPS ── */
+.perm-desc { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.perm-chip { border-radius: 9px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.perm-chip.permuted { background: var(--accent-light); border: 1px solid rgba(26,75,140,0.2); }
+.perm-chip.fixed { background: var(--bg); border: 1px solid var(--border); }
+.perm-chip-title { font-size: 11.5px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+.perm-chip-title .dot { width: 8px; height: 8px; border-radius: 50%; }
+.perm-chip.permuted .perm-chip-title { color: var(--accent); }
+.perm-chip.permuted .dot { background: var(--accent); }
+.perm-chip.fixed .perm-chip-title { color: var(--text3); }
+.perm-chip.fixed .dot { background: var(--fixed); }
+.perm-chip-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+/* ── EXAMPLE BOX ── */
+.example-box {
+  background: var(--bg); border-radius: 10px;
+  padding: 12px 15px; font-size: 13px; color: var(--text2); line-height: 1.65;
+  border-left: 3px solid var(--accent-mid);
+}
+.example-box strong { color: var(--accent); }
+
+/* ── ANIMATION CONTROLS ── */
+.anim-controls { display: flex; align-items: center; gap: 10px; margin-top: 18px; justify-content: center; }
+.anim-btn {
+  padding: 8px 22px; border-radius: 8px;
+  border: 1.5px solid var(--border2); background: var(--surface);
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 500;
+  cursor: pointer; color: var(--text); transition: all 0.15s;
+}
+.anim-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+.anim-btn.play-btn { background: var(--accent); color: white; border-color: var(--accent); }
+.anim-btn.play-btn:hover { opacity: 0.85; }
+
+/* ── FOOTER CREDIT ── */
+.footer-credit {
+  margin-top: 32px; text-align: center;
+  font-size: 11px; color: var(--text3); line-height: 1.7;
+}
+.footer-credit a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Modelos de Permutación · Cuarta Esquina</h1>
+  <p>Seleccioná un modelo para ver qué se permuta, qué se mantiene fijo y cómo se rompe la relación rasgo–ambiente.</p>
+</div>
+
+<div class="authors">
+  <p>
+    <strong>Lourdes M. Suárez Villasmil</strong><br>
+    <em>Cátedra de Bioestadística · Departamento de Matemáticas · Facultad de Ciencias Exactas Físicas y Naturales (FCEFyN) · Universidad Nacional de Córdoba, Argentina</em>
+    <br><br>
+    <strong>María de los Ángeles Marrero</strong><br>
+    <em>Doctorado en Ciencias Biológicas con Mención en Ecología · Pontificia Universidad Católica de Chile</em>
+  </p>
+</div>
+
+<div class="model-selector" id="modelSelector"></div>
+
+<div class="card">
+  <div class="model-header">
+    <div class="model-badge" id="badge">1</div>
+    <div class="model-info">
+      <h2 id="modelTitle">—</h2>
+      <div class="ref" id="modelRef">—</div>
+      <div class="h0" id="modelH0">—</div>
+    </div>
+  </div>
+
+  <div class="matrices-area" id="matricesArea">
+
+    <!-- R matrix -->
+    <div class="matrix-wrap">
+      <div class="matrix-label">Ambiente</div>
+      <div class="matrix-outer">
+        <div class="matrix-with-rowlabels">
+          <div class="row-labels-col" id="rowLabelsR"></div>
+          <div>
+            <div class="col-labels-row" id="colLabelsR"></div>
+            <div class="matrix-container mat-R" id="wrapR">
+              <div class="matrix-tag">R</div>
+              <div class="matrix-grid" id="gridR" style="grid-template-columns: repeat(4,36px)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- arrow RL -->
+    <div class="matrix-arrow">
+      <div class="arrow-line">→</div>
+      <div class="arrow-label" id="arrow1lbl">vincula</div>
+    </div>
+
+    <!-- L matrix -->
+    <div class="matrix-wrap">
+      <div class="matrix-label">Comunidad</div>
+      <div class="matrix-outer">
+        <div class="matrix-with-rowlabels">
+          <div class="row-labels-col" id="rowLabelsL"></div>
+          <div>
+            <div class="col-labels-row" id="colLabelsL"></div>
+            <div class="matrix-container mat-L" id="wrapL">
+              <div class="matrix-tag">L</div>
+              <div class="matrix-grid" id="gridL" style="grid-template-columns: repeat(4,36px)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- arrow LQ -->
+    <div class="matrix-arrow">
+      <div class="arrow-line">→</div>
+      <div class="arrow-label" id="arrow2lbl">vincula</div>
+    </div>
+
+    <!-- Q matrix -->
+    <div class="matrix-wrap">
+      <div class="matrix-label">Rasgos</div>
+      <div class="matrix-outer">
+        <div class="matrix-with-rowlabels">
+          <div class="row-labels-col" id="rowLabelsQ"></div>
+          <div>
+            <div class="col-labels-row" id="colLabelsQ"></div>
+            <div class="matrix-container mat-Q" id="wrapQ">
+              <div class="matrix-tag">Q</div>
+              <div class="matrix-grid" id="gridQ" style="grid-template-columns: repeat(4,36px)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="perm-desc" id="permDesc"></div>
+  <div class="example-box" id="exampleBox"></div>
+
+  <div class="anim-controls">
+    <button class="anim-btn play-btn" id="playBtn" onclick="togglePlay()">▶ Animar permutación</button>
+    <button class="anim-btn" onclick="resetCells()">↺ Resetear</button>
+  </div>
+
+  <div style="margin-top:20px;padding:14px 18px;background:var(--accent-light);border-radius:10px;border:0.5px solid rgba(26,75,140,0.15);display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:var(--text2);line-height:1.7">
+    <div style="font-weight:600;color:var(--accent);width:100%;margin-bottom:2px">Leyenda de etiquetas</div>
+    <div><span style="font-weight:700;color:var(--R)">S1–S4</span> &nbsp;Sitios de muestreo (filas de R y L)</div>
+    <div><span style="font-weight:700;color:var(--L)">Sp1–Sp4</span> &nbsp;Especies (columnas de L, filas de Q)</div>
+    <div><span style="font-weight:700;color:var(--R)">E1–E4</span> &nbsp;Variables ambientales (filas de R)</div>
+    <div><span style="font-weight:700;color:var(--Q)">F1–F4</span> &nbsp;Rasgos funcionales (columnas de Q)</div>
+    <div style="width:100%;color:var(--text3);font-size:11px;margin-top:2px">Las celdas resaltadas en azul indican qué se permuta en cada modelo. Las matrices atenuadas permanecen fijas.</div>
+  </div>
+
+  <div class="step-dots" id="stepDots"></div>
+</div>
+
+<div class="footer-credit">
+  Legendre et al. (1997) · Dray &amp; Legendre (2008) · ter Braak et al. (2012) · Dray et al. (2014)<br>
+  Material elaborado por Lourdes M. Suárez Villasmil &amp; María de los Ángeles Marrero
+</div>
+
+<script>
+const N = 4;
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const MODELS = [
+  {
+    id: 1,
+    name: 'Control ambiental sobre individuos',
+    ref: 'Gleason (1926) · Nicolson et al. (2002)',
+    h0: '<strong>H₀:</strong> no existe relación entre el ambiente y la distribución de cada especie individualmente.',
+    permL: 'indep',   // cada columna de L se baraja sola
+    permQ: false,
+    permR: false,
+    chips: [
+      { mat:'R', state:'fixed', title:'R — Variables ambientales', desc:'Fija. El ambiente no cambia.' },
+      { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Cada especie (columna) se baraja de forma independiente entre sitios.' },
+      { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo. La estructura funcional no cambia.' }
+    ],
+    example: '<strong>Ejemplo:</strong> Se toman las 4 coberturas de <em>Heliconia marginata</em> y se reparten al azar entre los 4 sitios. Luego se hace lo mismo con cada especie por separado. Las especies no se coordinan entre sí.'
+  },
+  {
+    id: 2,
+    name: 'Control ambiental sobre ensamblajes',
+    ref: 'Clements (1916) · Poorter et al. (2023)',
+    h0: '<strong>H₀:</strong> no existe relación entre el ambiente y la composición de los ensamblajes.',
+    permL: 'rows',
+    permQ: false,
+    permR: false,
+    chips: [
+      { mat:'R', state:'fixed', title:'R — Variables ambientales', desc:'Fija.' },
+      { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Filas enteras (sitios) se intercambian. Las especies varían juntas o no varían.' },
+      { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo.' }
+    ],
+    example: '<strong>Ejemplo:</strong> Todo el ensamblaje del sitio S1 (todas sus especies y coberturas) se asigna al azar a otro sitio. La composición interna de cada comunidad se conserva intacta.'
+  },
+  {
+    id: 3,
+    name: 'Lotería por espacios',
+    ref: 'Hubbell (2001) · Gleason (1926)',
+    h0: '<strong>H₀:</strong> no existe relación entre el ambiente y la abundancia relativa de especies dentro de cada sitio.',
+    permL: 'cols',
+    permQ: false,
+    permR: false,
+    chips: [
+      { mat:'R', state:'fixed', title:'R — Variables ambientales', desc:'Fija.' },
+      { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Columnas (especies) se barajan dentro de cada sitio por separado.' },
+      { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo.' }
+    ],
+    example: '<strong>Ejemplo:</strong> En la parcela P3 coexisten varias especies. ¿Por qué domina <em>Hymenachne</em> con 60% y no otra? El modelo pregunta si eso es azar de colonización o filtro ambiental real.'
+  },
+  {
+    id: 4,
+    name: 'Restricción por adaptaciones',
+    ref: 'Control histórico–evolutivo',
+    h0: '<strong>H₀:</strong> no existe relación entre los rasgos funcionales y la distribución espacial de las especies.',
+    permL: 'colswhole',  // columnas enteras de L (vectores de especie)
+    permQ: false,
+    permR: false,
+    chips: [
+      { mat:'R', state:'fixed', title:'R — Variables ambientales', desc:'Fija.' },
+      { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Columnas enteras (vectores de especie entre sitios) se permutan. Rompe la relación especie–rasgo.' },
+      { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo. Los rasgos permanecen asociados a su especie original.' }
+    ],
+    example: '<strong>Ejemplo:</strong> Distribución de especies en un gradiente de deshielo. Aquellas con mayor área foliar y contenido de nitrógeno se concentraron en sitios de deshielo tardío, mientras que especies con mayor ángulo foliar y altura aparecieron en sitios de deshielo temprano (Dray et al., 2014).'
+  },
+  {
+    id: 5,
+    name: 'Mezcla de regulación ambiental y adaptaciones',
+    ref: 'Combinación restringida M2 + M4',
+    h0: '<strong>H₀:</strong> no existe relación entre el ambiente y las especies, ni entre los rasgos y las especies.',
+    permL: 'both',  // filas + columnas de L
+    permQ: false,
+    permR: false,
+    chips: [
+      { mat:'R', state:'fixed', title:'R — Variables ambientales', desc:'Fija.' },
+      { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Filas Y columnas se permutan simultáneamente (combina M2 y M4).' },
+      { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo.' }
+    ],
+    example: '<strong>Ejemplo:</strong> Un herbazal donde <em>Sporobolus virginicus</em> domina tanto por su plasticidad fenotípica como por el pH del suelo. Algunas asociaciones responden al sitio, otras a los rasgos heredados.'
+  },
+  {
+    id: 6,
+    name: 'Interacción total predictiva',
+    ref: 'ter Braak et al. (2012) ★ Recomendado',
+    h0: '<strong>H₀:</strong> no existe relación entre los rasgos funcionales y el ambiente mediada por la distribución de especies.',
+    permL: 'sequential',
+    permQ: false,
+    permR: false,
+    chips: [
+      { mat:'R', state:'fixed', title:'R — Variables ambientales', desc:'Fija en ambos brazos.' },
+      { mat:'L', state:'perm',  title:'L — Comunidad', desc:'Brazo A: permuta filas (como M2). Brazo B: permuta columnas enteras (como M4). Dos pruebas separadas.' },
+      { mat:'Q', state:'fixed', title:'Q — Rasgos', desc:'Fijo en ambos brazos.' }
+    ],
+    example: '<strong>Ejemplo:</strong> Aves urbanas cuya presencia depende estrictamente de si anidan en edificios y su hábito alimenticio. El modelo más estricto: controla el error tipo I en todos los escenarios posibles.'
+  }
+];
+
+// ── MATRIX DATA ───────────────────────────────────────────────────────────────
+const R_DATA = [
+  [2.1,6.8,74,1],[1.5,7.2,85,2],[2.8,6.5,60,0],[1.2,7.9,91,3]
+];
+const L_DATA = [
+  [5,2,0,1],[3,4,1,0],[1,3,4,2],[0,1,5,4]
+];
+const Q_DATA = [
+  [8,0.2,12,1],[15,0.4,22,0],[25,0.8,35,1],[30,0.9,42,1]
+];
+
+let currentModel = 1;
+let animInterval = null;
+let animStep = 0;
+let isPlaying = false;
+let armBMode = false;
+
+// ── BUILD UI ──────────────────────────────────────────────────────────────────
+function buildSelector() {
+  const el = document.getElementById('modelSelector');
+  MODELS.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'model-btn' + (m.id === 1 ? ' active' : '');
+    btn.id = 'mbtn-' + m.id;
+    btn.innerHTML = `<span class="num">${m.id}</span><span class="lbl">M${m.id}</span>`;
+    btn.onclick = () => selectModel(m.id);
+    el.appendChild(btn);
+  });
+}
+
+function buildMatrix(gridId, data, rowClass, colClass, mode) {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  const nR = data.length, nC = data[0].length;
+  for (let r = 0; r < nR; r++) {
+    for (let c = 0; c < nC; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.id = `${gridId}_${r}_${c}`;
+      cell.textContent = data[r][c];
+      if (mode === 'rows' && rowClass) cell.classList.add(rowClass);
+      else if (mode === 'cols' && colClass) cell.classList.add(colClass);
+      else if (mode === 'indep' && colClass) cell.classList.add(colClass);
+      else if (mode === 'both') cell.classList.add(rowClass || colClass);
+      grid.appendChild(cell);
+    }
+  }
+}
+
+function buildChips(chips) {
+  const el = document.getElementById('permDesc');
+  el.innerHTML = '';
+  chips.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'perm-chip ' + (c.state === 'perm' ? 'permuted' : 'fixed');
+    div.innerHTML = `
+      <div class="perm-chip-title">
+        <div class="dot"></div>
+        ${c.title}
+      </div>
+      <div class="perm-chip-desc">${c.desc}</div>`;
+    el.appendChild(div);
+  });
+}
+
+function selectModel(id) {
+  stopAnim();
+  currentModel = id;
+  armBMode = false;
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mbtn-' + id).classList.add('active');
+  renderModel(id);
+}
+
+function renderModel(id) {
+  const m = MODELS.find(x => x.id === id);
+  document.getElementById('badge').textContent = m.id;
+  document.getElementById('modelTitle').textContent = m.name;
+  document.getElementById('modelRef').textContent = m.ref;
+  document.getElementById('modelH0').innerHTML = m.h0;
+  document.getElementById('exampleBox').innerHTML = m.example;
+
+  // Update play button
+  document.getElementById('playBtn').textContent = '▶ Animar permutación';
+  isPlaying = false;
+
+  buildChips(m.chips);
+  resetCells();
+}
+
+function resetCells() {
+  stopAnim();
+  isPlaying = false;
+  armBMode = false;
+  document.getElementById('playBtn').textContent = '▶ Animar permutación';
+
+  // Reset L
+  const gridL = document.getElementById('gridL');
+  gridL.innerHTML = '';
+  const wL = document.getElementById('wrapL');
+  wL.classList.remove('perm-active','fixed-dim');
+
+  // Reset Q
+  const gridQ = document.getElementById('gridQ');
+  gridQ.innerHTML = '';
+  const wQ = document.getElementById('wrapQ');
+  wQ.classList.remove('perm-active','fixed-dim');
+
+  // Reset R
+  const wR = document.getElementById('wrapR');
+  wR.classList.remove('perm-active','fixed-dim');
+
+  renderGridNeutral('gridL', L_DATA);
+  renderGridNeutral('gridQ', Q_DATA);
+  renderGridNeutral('gridR', R_DATA);
+}
+
+// Labels per matrix
+const LABELS = {
+  gridR: {
+    rows: ['E1','E2','E3','E4'],
+    cols: ['S1','S2','S3','S4'],
+    rowsId: 'rowLabelsR', colsId: 'colLabelsR'
+  },
+  gridL: {
+    rows: ['S1','S2','S3','S4'],
+    cols: ['Sp1','Sp2','Sp3','Sp4'],
+    rowsId: 'rowLabelsL', colsId: 'colLabelsL'
+  },
+  gridQ: {
+    rows: ['Sp1','Sp2','Sp3','Sp4'],
+    cols: ['F1','F2','F3','F4'],
+    rowsId: 'rowLabelsQ', colsId: 'colLabelsQ'
+  }
+};
+
+function renderGridNeutral(gridId, data) {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  data.forEach((row, r) => {
+    row.forEach((val, c) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.id = `${gridId}_${r}_${c}`;
+      cell.textContent = typeof val === 'number' && !Number.isInteger(val) ? val.toFixed(1) : val;
+      grid.appendChild(cell);
+    });
+  });
+
+  // Build row labels
+  const lblInfo = LABELS[gridId];
+  if (!lblInfo) return;
+
+  const rowEl = document.getElementById(lblInfo.rowsId);
+  if (rowEl) {
+    rowEl.innerHTML = '';
+    lblInfo.rows.forEach(lbl => {
+      const d = document.createElement('div');
+      d.className = 'row-label';
+      d.textContent = lbl;
+      d.title = lbl;
+      rowEl.appendChild(d);
+    });
+  }
+
+  const colEl = document.getElementById(lblInfo.colsId);
+  if (colEl) {
+    colEl.innerHTML = '';
+    lblInfo.cols.forEach(lbl => {
+      const d = document.createElement('div');
+      d.className = 'col-label';
+      d.textContent = lbl;
+      d.title = lbl;
+      colEl.appendChild(d);
+    });
+  }
+}
+
+// ── ANIMATION ─────────────────────────────────────────────────────────────────
+function togglePlay() {
+  if (isPlaying) { stopAnim(); return; }
+  isPlaying = true;
+  document.getElementById('playBtn').textContent = '⏸ Pausar';
+  const m = MODELS.find(x => x.id === currentModel);
+  animStep = 0;
+  runAnimStep(m);
+}
+
+function stopAnim() {
+  if (animInterval) { clearTimeout(animInterval); animInterval = null; }
+  isPlaying = false;
+  document.getElementById('playBtn').textContent = '▶ Animar permutación';
+}
+
+function runAnimStep(m) {
+  if (!isPlaying) return;
+  const mode = armBMode ? 'colswhole' : m.permL;
+
+  if (mode === 'rows') animateRows(m);
+  else if (mode === 'cols') animateCols(m);
+  else if (mode === 'indep') animateIndep(m);
+  else if (mode === 'colswhole') animateColsWhole(m);
+  else if (mode === 'both') animateBoth(m);
+  else if (mode === 'sequential') animateSequential(m);
+}
+
+function animateRows(m) {
+  // Highlight two random rows and swap them
+  const r1 = Math.floor(Math.random() * N);
+  let r2 = Math.floor(Math.random() * N);
+  while (r2 === r1) r2 = Math.floor(Math.random() * N);
+
+  document.getElementById('wrapL').classList.add('perm-active');
+  document.getElementById('wrapR').classList.add('fixed-dim');
+  document.getElementById('wrapQ').classList.add('fixed-dim');
+
+  // highlight rows
+  for (let c = 0; c < N; c++) {
+    const c1 = document.getElementById(`gridL_${r1}_${c}`);
+    const c2 = document.getElementById(`gridL_${r2}_${c}`);
+    if (c1) c1.classList.add('row-perm');
+    if (c2) c2.classList.add('row-perm');
+  }
+
+  animInterval = setTimeout(() => {
+    // swap values
+    for (let c = 0; c < N; c++) {
+      const c1 = document.getElementById(`gridL_${r1}_${c}`);
+      const c2 = document.getElementById(`gridL_${r2}_${c}`);
+      if (c1 && c2) {
+        const tmp = c1.textContent; c1.textContent = c2.textContent; c2.textContent = tmp;
+        c1.classList.add('moving'); c2.classList.add('moving');
+      }
+    }
+    animInterval = setTimeout(() => {
+      for (let c = 0; c < N; c++) {
+        const c1 = document.getElementById(`gridL_${r1}_${c}`);
+        const c2 = document.getElementById(`gridL_${r2}_${c}`);
+        if (c1) { c1.classList.remove('row-perm','moving'); }
+        if (c2) { c2.classList.remove('row-perm','moving'); }
+      }
+      if (isPlaying) animInterval = setTimeout(() => runAnimStep(m), 900);
+    }, 600);
+  }, 700);
+}
+
+function animateCols(m) {
+  // Pick a random row and shuffle its cells
+  const row = Math.floor(Math.random() * N);
+  document.getElementById('wrapL').classList.add('perm-active');
+  document.getElementById('wrapR').classList.add('fixed-dim');
+  document.getElementById('wrapQ').classList.add('fixed-dim');
+
+  const cols = Array.from({length:N},(_,i)=>i);
+  for (let c = 0; c < N; c++) {
+    const cell = document.getElementById(`gridL_${row}_${c}`);
+    if (cell) cell.classList.add('col-perm');
+  }
+  animInterval = setTimeout(() => {
+    // shuffle within row
+    const vals = cols.map(c => document.getElementById(`gridL_${row}_${c}`).textContent);
+    const shuffled = [...vals].sort(() => Math.random()-0.5);
+    cols.forEach((c,i) => {
+      const cell = document.getElementById(`gridL_${row}_${c}`);
+      cell.textContent = shuffled[i];
+      cell.classList.add('moving');
+    });
+    animInterval = setTimeout(() => {
+      for (let c = 0; c < N; c++) {
+        const cell = document.getElementById(`gridL_${row}_${c}`);
+        if (cell) cell.classList.remove('col-perm','moving');
+      }
+      if (isPlaying) animInterval = setTimeout(() => runAnimStep(m), 800);
+    }, 600);
+  }, 700);
+}
+
+function animateIndep(m) {
+  // Shuffle one random column independently
+  const col = Math.floor(Math.random() * N);
+  document.getElementById('wrapL').classList.add('perm-active');
+  document.getElementById('wrapR').classList.add('fixed-dim');
+  document.getElementById('wrapQ').classList.add('fixed-dim');
+
+  for (let r = 0; r < N; r++) {
+    const cell = document.getElementById(`gridL_${r}_${col}`);
+    if (cell) cell.classList.add('indep-perm');
+  }
+  animInterval = setTimeout(() => {
+    const vals = Array.from({length:N},(_,r) => document.getElementById(`gridL_${r}_${col}`).textContent);
+    const shuffled = [...vals].sort(()=>Math.random()-0.5);
+    for (let r = 0; r < N; r++) {
+      const cell = document.getElementById(`gridL_${r}_${col}`);
+      cell.textContent = shuffled[r];
+      cell.classList.add('moving');
+    }
+    animInterval = setTimeout(() => {
+      for (let r = 0; r < N; r++) {
+        const cell = document.getElementById(`gridL_${r}_${col}`);
+        if (cell) cell.classList.remove('indep-perm','moving');
+      }
+      if (isPlaying) animInterval = setTimeout(() => runAnimStep(m), 800);
+    }, 600);
+  }, 700);
+}
+
+function animateColsWhole(m) {
+  // Swap two entire columns of L
+  const c1 = Math.floor(Math.random()*N);
+  let c2 = Math.floor(Math.random()*N);
+  while (c2===c1) c2 = Math.floor(Math.random()*N);
+
+  document.getElementById('wrapL').classList.add('perm-active');
+  document.getElementById('wrapR').classList.add('fixed-dim');
+  document.getElementById('wrapQ').classList.add('fixed-dim');
+
+  for (let r=0;r<N;r++) {
+    const ca = document.getElementById(`gridL_${r}_${c1}`);
+    const cb = document.getElementById(`gridL_${r}_${c2}`);
+    if (ca) ca.classList.add('col-perm');
+    if (cb) cb.classList.add('col-perm');
+  }
+  animInterval = setTimeout(() => {
+    for (let r=0;r<N;r++){
+      const ca = document.getElementById(`gridL_${r}_${c1}`);
+      const cb = document.getElementById(`gridL_${r}_${c2}`);
+      if (ca&&cb){ const tmp=ca.textContent; ca.textContent=cb.textContent; cb.textContent=tmp; ca.classList.add('moving'); cb.classList.add('moving'); }
+    }
+    animInterval = setTimeout(() => {
+      for (let r=0;r<N;r++){
+        const ca = document.getElementById(`gridL_${r}_${c1}`);
+        const cb = document.getElementById(`gridL_${r}_${c2}`);
+        if (ca) ca.classList.remove('col-perm','moving');
+        if (cb) cb.classList.remove('col-perm','moving');
+      }
+      if (isPlaying) animInterval = setTimeout(()=>runAnimStep(m),800);
+    }, 600);
+  }, 700);
+}
+
+function animateBoth(m) {
+  // PASO 1: permuta filas (como M2)
+  const r1 = Math.floor(Math.random() * N);
+  let r2 = Math.floor(Math.random() * N);
+  while (r2 === r1) r2 = Math.floor(Math.random() * N);
+
+  document.getElementById('wrapL').classList.add('perm-active');
+  document.getElementById('wrapR').classList.add('fixed-dim');
+  document.getElementById('wrapQ').classList.add('fixed-dim');
+
+  document.getElementById('exampleBox').innerHTML =
+    '<strong style="color:#7c3aed">Paso 1 — permuta filas (sitios completos, como M2):</strong> el ensamblaje del sitio S' + (r1+1) + ' se intercambia con S' + (r2+1) + '. Las especies viajan juntas.<br><br>' + m.example;
+
+  // highlight filas
+  for (let c = 0; c < N; c++) {
+    const ca = document.getElementById(`gridL_${r1}_${c}`);
+    const cb = document.getElementById(`gridL_${r2}_${c}`);
+    if (ca) ca.classList.add('row-perm');
+    if (cb) cb.classList.add('row-perm');
+  }
+
+  animInterval = setTimeout(() => {
+    // swap filas
+    for (let c = 0; c < N; c++) {
+      const ca = document.getElementById(`gridL_${r1}_${c}`);
+      const cb = document.getElementById(`gridL_${r2}_${c}`);
+      if (ca && cb) {
+        const tmp = ca.textContent; ca.textContent = cb.textContent; cb.textContent = tmp;
+        ca.classList.add('moving'); cb.classList.add('moving');
+      }
+    }
+    animInterval = setTimeout(() => {
+      for (let c = 0; c < N; c++) {
+        const ca = document.getElementById(`gridL_${r1}_${c}`);
+        const cb = document.getElementById(`gridL_${r2}_${c}`);
+        if (ca) ca.classList.remove('row-perm', 'moving');
+        if (cb) cb.classList.remove('row-perm', 'moving');
+      }
+
+      // PASO 2: permuta columnas enteras (especies completas, como M4)
+      const c1 = Math.floor(Math.random() * N);
+      let c2 = Math.floor(Math.random() * N);
+      while (c2 === c1) c2 = Math.floor(Math.random() * N);
+
+      document.getElementById('exampleBox').innerHTML =
+        '<strong style="color:#7c3aed">Paso 2 — permuta columnas (vectores de especie, como M4):</strong> Sp' + (c1+1) + ' intercambia su distribución completa con Sp' + (c2+1) + '. Rompe la relación especie–rasgo.<br><br>' + m.example;
+
+      for (let r = 0; r < N; r++) {
+        const ca = document.getElementById(`gridL_${r}_${c1}`);
+        const cb = document.getElementById(`gridL_${r}_${c2}`);
+        if (ca) ca.classList.add('col-perm');
+        if (cb) cb.classList.add('col-perm');
+      }
+
+      animInterval = setTimeout(() => {
+        for (let r = 0; r < N; r++) {
+          const ca = document.getElementById(`gridL_${r}_${c1}`);
+          const cb = document.getElementById(`gridL_${r}_${c2}`);
+          if (ca && cb) {
+            const tmp = ca.textContent; ca.textContent = cb.textContent; cb.textContent = tmp;
+            ca.classList.add('moving'); cb.classList.add('moving');
+          }
+        }
+        animInterval = setTimeout(() => {
+          for (let r = 0; r < N; r++) {
+            const ca = document.getElementById(`gridL_${r}_${c1}`);
+            const cb = document.getElementById(`gridL_${r}_${c2}`);
+            if (ca) ca.classList.remove('col-perm', 'moving');
+            if (cb) cb.classList.remove('col-perm', 'moving');
+          }
+          document.getElementById('exampleBox').innerHTML =
+            '<strong style="color:#7c3aed">Ambos pasos aplicados simultáneamente en cada permutación.</strong> Esto rompe a la vez el vínculo ambiente–sitio (M2) y el vínculo especie–rasgo (M4).<br><br>' + m.example;
+          if (isPlaying) animInterval = setTimeout(() => runAnimStep(m), 1000);
+        }, 600);
+      }, 700);
+
+    }, 600);
+  }, 700);
+}
+
+function animateSequential(m) {
+  // Toggle between arm A and arm B
+  const label = armBMode ? 'Brazo B — permuta columnas de L (como M4)' : 'Brazo A — permuta filas de L (como M2)';
+
+  // Show which arm
+  document.getElementById('exampleBox').innerHTML =
+    `<strong>${label}</strong><br>` + m.example;
+
+  if (!armBMode) {
+    animateRows(m);
+  } else {
+    animateColsWhole(m);
+  }
+
+  // Toggle arm after this step completes
+  animInterval = setTimeout(() => {
+    armBMode = !armBMode;
+    if (isPlaying) runAnimStep(m);
+  }, 2400);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildSelector();
+renderModel(1);
+</script>
+</body>
+</html>
